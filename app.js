@@ -230,7 +230,9 @@ var app;
 				var _obj = this;
 			}else{
 				this.marker.setLatLng([lat, lon]).update();
-	//			S('.my-location-accuracy').css({'width':a+'px','height':a+'px'});
+				acc = document.getElementsByClassName('my-location-accuracy')[0];
+				acc.style.setProperty('width',a+'px');
+				acc.style.setProperty('height',a+'px');
 			}
 
 
