@@ -23,12 +23,11 @@
 
 	<script type="text/javascript" src="app.js"></script>
 	
-	{% if false	%}
-	<div class="sidebar">
-		<strong>Test</strong>
-	</div>
-	{% endif %}
-	{% include_relative signals.geojson %}
+{% if true	%}
+	Included {% include_relative resources/odileeds-white3.svg %}	
+{% else %}
+	Inline <img src="resources/odileeds-white3.svg" style="width:8em;height:4em;" />
+{% endif %}
 
 
 {% if false	%}
