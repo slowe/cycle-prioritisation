@@ -23,16 +23,18 @@
 
 	<script type="text/javascript" src="app.js"></script>
 	
-{% if true	%}
+	<div class="jekyll-parse">
+{% if true %}
 	Included {% include_relative resources/odileeds-white3.svg %}	
 {% else %}
-	Inline <img src="resources/odileeds-white3.svg" style="width:8em;height:4em;" />
+	Inline <img src="resources/odileeds-white3.svg" style="width:8em;height:4em;" class="to-svg" id="one" />
 {% endif %}
+	</div>
 
-
+	<div class="jekyll-remove">
 {% if false	%}
-	<script type="text/javascript" src="resources/test.js"></script>
+		<script type="text/javascript" src="resources/test.js"></script>
 {% endif %}
-
+	</div>
 </body>
 </html>
