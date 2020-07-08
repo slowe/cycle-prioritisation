@@ -201,6 +201,10 @@ var app;
 
 		this.setLocation = function(p){
 
+			if(!p){
+				console.warning('No location provided');
+				return this;
+			}
 			var btns = document.getElementsByClassName('leaflet-control-geolocate');
 
 			console.log('setLocation',p);
