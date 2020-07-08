@@ -1,5 +1,6 @@
 var app;
 
+
 (function(root){
 	
 	// Function to find if point is inside polygon from https://github.com/substack/point-in-polygon
@@ -21,106 +22,6 @@ var app;
 
 		return inside;
 	};
-
-
-
-
-	function ajax(url,attrs){
-
-		if(typeof url!=="string") return false;
-		if(!attrs) attrs = {};
-		var cb = "",qs = "";
-		var oReq,urlbits;
-		// If part of the URL is query string we split that first
-		if(url.indexOf("?") > 0){
-			urlbits = url.split("?");
-			if(urlbits.length){
-				url = urlbits[0];
-				qs = urlbits[1];
-			}
-		}
-		if(attrs.dataType=="jsonp"){
-			cb = 'fn_'+(new Date()).getTime();
-			window[cb] = function(rsp){
-				if(typeof attrs.success==="function") attrs.success.call((attrs['this'] ? attrs['this'] : this), rsp, attrs);
-			};
-		}
-		if(typeof attrs.cache==="boolean" && !attrs.cache) qs += (qs ? '&':'')+(new Date()).valueOf();
-		if(cb) qs += (qs ? '&':'')+'callback='+cb;
-		if(attrs.data) qs += (qs ? '&':'')+attrs.data;
-
-		// Build the URL to query
-		if(attrs.method=="POST") attrs.url = url;
-		else attrs.url = url+(qs ? '?'+qs:'');
-
-		if(attrs.dataType=="jsonp"){
-			var script = document.createElement('script');
-			script.src = attrs.url;
-			document.body.appendChild(script);
-			return this;
-		}
-
-		// code for IE7+/Firefox/Chrome/Opera/Safari or for IE6/IE5
-		oReq = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-		oReq.addEventListener("load", window[cb] || complete);
-		oReq.addEventListener("error", error);
-		oReq.addEventListener("progress", progress);
-		var responseTypeAware = 'responseType' in oReq;
-		if(attrs.beforeSend) oReq = attrs.beforeSend.call((attrs['this'] ? attrs['this'] : this), oReq, attrs);
-		if(attrs.dataType=="script") oReq.overrideMimeType('text/javascript');
-
-		function complete(evt) {
-			attrs.header = oReq.getAllResponseHeaders();
-			var rsp;
-			if(oReq.status == 200 || oReq.status == 201 || oReq.status == 202) {
-				rsp = oReq.response;
-				if(oReq.responseType=="" || oReq.responseType=="text") rsp = oReq.responseText;
-				if(attrs.dataType=="json"){
-					try {
-						if(typeof rsp==="string") rsp = JSON.parse(rsp.replace(/[\n\r]/g,"\\n").replace(/^([^\(]+)\((.*)\)([^\)]*)$/,function(e,a,b,c){ return (a==cb) ? b:''; }).replace(/\\n/g,"\n"));
-					} catch(e){ error(e); }
-				}
-
-				// Parse out content in the appropriate callback
-				if(attrs.dataType=="script"){
-					var fileref=document.createElement('script');
-					fileref.setAttribute("type","text/javascript");
-					fileref.innerHTML = rsp;
-					document.head.appendChild(fileref);
-				}
-				attrs.statusText = 'success';
-				if(typeof attrs.success==="function") attrs.success.call((attrs['this'] ? attrs['this'] : this), rsp, attrs);
-			}else{
-				attrs.statusText = 'error';
-				error(evt);
-			}
-			if(typeof attrs.complete==="function") attrs.complete.call((attrs['this'] ? attrs['this'] : this), rsp, attrs);
-		}
-
-		function error(evt){
-			if(typeof attrs.error==="function") attrs.error.call((attrs['this'] ? attrs['this'] : this),evt,attrs);
-		}
-
-		function progress(evt){
-			if(typeof attrs.progress==="function") attrs.progress.call((attrs['this'] ? attrs['this'] : this),evt,attrs);
-		}
-
-		if(responseTypeAware && attrs.dataType){
-			try { oReq.responseType = attrs.dataType; }
-			catch(err){ error(err); }
-		}
-
-		try{ oReq.open((attrs.method||'GET'), attrs.url, true); }
-		catch(err){ error(err); }
-
-		if(attrs.method=="POST") oReq.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-
-		try{ oReq.send((attrs.method=="POST" ? qs : null)); }
-		catch(err){ error(err); }
-
-		return this;
-	}
-
 
 	var baseMaps = {};
 
@@ -144,7 +45,6 @@ var app;
 		subdomains: 'abcd',
 		maxZoom: 19
 	});
-
 
 	var icons = {
 		'hide':'<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>hide layer</title><path style="fill:%COLOR%;" d="M16 6c-6.979 0-13.028 4.064-16 10 2.972 5.936 9.021 10 16 10s13.027-4.064 16-10c-2.972-5.936-9.021-10-16-10zM23.889 11.303c1.88 1.199 3.473 2.805 4.67 4.697-1.197 1.891-2.79 3.498-4.67 4.697-2.362 1.507-5.090 2.303-7.889 2.303s-5.527-0.796-7.889-2.303c-1.88-1.199-3.473-2.805-4.67-4.697 1.197-1.891 2.79-3.498 4.67-4.697 0.122-0.078 0.246-0.154 0.371-0.228-0.311 0.854-0.482 1.776-0.482 2.737 0 4.418 3.582 8 8 8s8-3.582 8-8c0-0.962-0.17-1.883-0.482-2.737 0.124 0.074 0.248 0.15 0.371 0.228v0zM16 13c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"></path></svg>',
@@ -174,17 +74,10 @@ var app;
 		});
 	}
 	
-	var lat = 53.79659;
-	var lon = -1.53385;
-	var d = 0.0005;
-	var bbox = [[lat-d, lon-d],[lat+d, lon+d]];
-
-	var map = L.map('map',{'layers':[baseMaps['Greyscale']],'scrollWheelZoom':true,'editable': true,'zoomControl': false}).fitBounds(bbox);
-
 
 
 	// Convert metres to pixels (used by GeoLocation)
-	function m2px(m,lat,zoom){
+	function m2px(map,m,lat,zoom){
 		if(!lat) lat = map.getCenter().lat;
 		if(!zoom) zoom = map.getZoom();
 		var mperpx = 40075016.686 * Math.abs(Math.cos(lat * 180/Math.PI)) / Math.pow(2, zoom+8);
@@ -192,36 +85,44 @@ var app;
 	}
 	
 	function log(){
-		console.log(arguments);
 		var str = "";
 		var el = document.getElementById('log');
 		var typ = (typeof arguments[0]==="string" && (arguments[0]=="log" || arguments[0]=="warning" || arguments[0]=="error" || arguments[0]=="info")) ? arguments[0] : "log";
 		var d = (new Date()).toISOString().replace(/^.*T([0-9]{2}:[0-9]{2}:[0-9]{2}).*$/,function(m,p1){ return p1; });
 		for(var i = 1; i < arguments.length; i++){
 			console[typ](i,arguments[i]);
-			if(typeof arguments[i]==="string") str += (str ? "<br />":"")+d+': '+arguments[i];
+			if(typeof arguments[i]==="string") str += '<span class="'+typ+'"></span>'+(str ? "<br />":"")+d+': '+arguments[i];
 		}
-		el.innerHTML = str+'<br />'+el.innerHTML;
+		el.innerHTML = '<div>'+str+'</div>'+el.innerHTML;
 		return this;
 	}
 	// Define a function to get user location
 	function GeoLocation(options){
 		if(!options) options = {};
+		callbacks = {};
+		if(!options.map){
+			log("error","No map provided to attach to.");
+			return this;
+		}
 
 		this.locating = false;
 
 		var _obj = this;
-
+		
+		this.on = function(cb,opts,fn){
+			if(typeof opts==="function"){ fn = opts; opts = {}; }
+			callbacks[cb] = {'fn':fn,'opts':opts};
+			return this;
+		}
+		
 		this.setLocation = function(p){
 
 			if(!p){
 				log('warning','No location provided');
 				return this;
 			}
-			log('info','setLocation');
+			log('log','setLocation',p);
 			var btns = document.getElementsByClassName('leaflet-control-geolocate');
-
-			console.log('setLocation',p);
 
 			if(!this.locating){
 				this.p = null;
@@ -236,7 +137,7 @@ var app;
 			lat = p.coords.latitude;
 			lon = p.coords.longitude;
 			this.p = p;
-			var a = Math.round(2*m2px(p.coords.accuracy,lat));
+			var a = Math.round(2*m2px(options.map,p.coords.accuracy,lat));
 			var marker;
 
 	//		btn.addClass('live-location');
@@ -244,7 +145,8 @@ var app;
 				var s = 10;
 				var ico = L.divIcon({ html: '<div class="my-location-accuracy" style="width:'+a+'px;height:'+a+'px"></div>', 'className':'my-location', 'iconSize': L.point(s, s) });
 				this.marker = L.marker([lat, lon],{icon:ico});
-				this.marker.addTo(map);
+				this.marker.addTo(options.map);
+				log('log',lat+','+lon);
 				var _obj = this;
 			}else{
 				this.marker.setLatLng([lat, lon]).update();
@@ -254,20 +156,60 @@ var app;
 			}
 
 
-			if(!this.centred){
+//			if(!this.centred){
 				// We want to centre the view and update the nodes
-				map.panTo(new L.LatLng(lat, lon))
-				this.centred = true;
-			}
-
+				options.map.panTo(new L.LatLng(lat, lon))
+//				this.centred = true;
+//			}
+			
+			var e = callbacks['location'].opts;
+			e.lat = lat;
+			e.lon = lon;
+			if(callbacks['location'] && typeof callbacks['location'].fn==="function") callbacks['location'].fn.call(callbacks['location'].opts['this']||this,e);
+			return this;
 		}
+
+		this.locate = function(e){
+			
+			log('log','click on button');
+			e.preventDefault();
+			_obj.centred = false;
+			_obj.locating = !_obj.locating;
+
+			if(_obj.locating){
+				document.getElementById('locate').classList.add('active');
+				//if(options.mapper.callbacks && options.mapper.callbacks.geostart) options.mapper.callbacks.geostart.call(this);
+
+				// Start watching the user location
+				_obj.watchID = navigator.geolocation.watchPosition(function(position){
+					_obj.setLocation(position);
+				},function(error){
+					log('error','Sorry, no position available.',`ERROR(${error.code}): ${error.message}`);
+				},{
+					enableHighAccuracy: true, 
+					maximumAge        : 2000, 
+					timeout           : 10000
+				});
+
+				// Create a checker to see if the geolocation is live
+				_obj.check = setInterval(function(){ _obj.updateLive(); },10000);
+
+			}else{
+				document.getElementById('locate').classList.remove('active');
+
+				_obj.setLocation();
+
+			}
+		}
+		document.getElementById('locate').addEventListener('click',this.locate);
+
 
 		if("geolocation" in navigator){
 
 			// We need a function that checks how live the position is
 			// that runs independently of the geolocation api
 			this.updateLive = function(){
-				console.log('GeoLocation check',this.p);
+				log('log','GeoLocation check',this.p);
 				if(this.p){
 					var ago = ((new Date())-this.p.timestamp)/1000;
 					if(ago > 10) S('.leaflet-control-geolocate').removeClass('live-location');
@@ -280,84 +222,116 @@ var app;
 				"options": { position: 'topleft' },
 				"onAdd": function (map){
 
-					console.log('control onAdd',map)
+					log('log','control onAdd',map);
 
 					var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-geolocate');
 					container.innerHTML = '<a href="#">'+getIcon('geo','black')+'</a>';
-					container.onclick = function(e){
-
-						e.preventDefault();
-						_obj.centred = false;
-						_obj.locating = !_obj.locating;
-
-						if(_obj.locating){
-							//if(options.mapper.callbacks && options.mapper.callbacks.geostart) options.mapper.callbacks.geostart.call(this);
-
-							// Start watching the user location
-							_obj.watchID = navigator.geolocation.watchPosition(function(position){
-								_obj.setLocation(position);
-							},function(){
-								console.error("Sorry, no position available.");
-							},{
-								enableHighAccuracy: true, 
-								maximumAge        : 30000, 
-								timeout           : 27000
-							});
-
-							// Create a checker to see if the geolocation is live
-							_obj.check = setInterval(function(){ _obj.updateLive(); },10000);
-
-						}else{
-
-							_obj.setLocation();
-
-						}
-					}
+					container.onclick = _obj.locate;
 					return container;
 				}
 			});
 
-			map.addControl(new _obj.control());
+			options.map.addControl(new _obj.control());
 
 		}else{
 
-			console.warn('No location services available');
+			log('warning','No location services available');
 
 		}
 
 		return this;
 	}
-
-	// Add geolocation control and interaction
-	var geolocation = new GeoLocation({});
-
-
-	var signals;
 	
-	ajax("signals.geojson",{
-		"dataType":"json",
-		"success":function(d){
-			console.log('success',d);
-			var colour = "black";
-			
-			var customicon = makeMarker("marker",colour);
-			console.log(customicon);
-			var _obj = this;
+	function App(opts){
 
-			var geoattrs = {
-				'style': { "color": colour, "weight": 2, "opacity": 0.65 },
-				'pointToLayer': function(geoJsonPoint, latlng){ return L.marker(latlng,{icon: customicon}); },
-				'onEachFeature': function(feature, layer){
-					//var popup = popuptext(feature,{'id':id,'this':_obj});
-					//if(popup) layer.bindPopup(popup);
+		var lat = 53.79659;
+		var lon = -1.53385;
+		var d = 0.0005;
+		var bbox = [[lat-d, lon-d],[lat+d, lon+d]];
+		var styles = {
+			'default': { "color": 'black', "weight": 1, "opacity": 0.5 },
+			'highlight': { "color": 'blue', "weight": 3, "opacity": 0.7 }
+		};
+
+		this.map = L.map('map',{'layers':[baseMaps['Greyscale']],'scrollWheelZoom':true,'editable': true,'zoomControl': false}).fitBounds(bbox);
+
+		// Add geolocation control and interaction
+		this.geolocation = new GeoLocation({'map':this.map});
+		this.geolocation.on('location',{this:this},function(e){
+			log('log','location',e);
+			for(var i = 0; i < this.detectionzones.length; i++){
+				if(inside([e.lon,e.lat],this.detectionzones[i].poly)){
+					log('info','Inside '+i+' ('+this.detectionzones[i].id+')',this.detectionzones[i]);
+					if(this.detectionzones[i].id){
+						this.detectionzones[i].l.setStyle(styles['highlight']);
+					}else{
+						this.detectionzones[i].l.setStyle(styles['default']);
+					}
+				}else{
+					this.detectionzones[i].l.setStyle(styles['default']);					
 				}
-			};
-			
-			
-			signals = L.geoJSON(d,geoattrs);
-			signals.addTo(map);
-		}
-	});
+			}
+			return this;
+		});
+		var _obj = this;
 
-	app = {'map':map};
+		this.getFeatures = function(){
+
+			fetch("signals.geojson",{cache: "reload"}).then(response => {
+				if(response.ok) return response.json();
+			}).then(json => {
+				log('log','success',json);
+
+				// Process features
+				_obj.detectionzones = [];
+				for(var i = 0; i < json.features.length; i++){
+					json.features[i].id = i;
+					if(json.features[i].geometry.coordinates.length == 1){
+						json.features[i].zone = true;
+						_obj.detectionzones.push({'id':i,'poly':json.features[i].geometry.coordinates[0]});
+					}else{
+						json.features[i].zone = false;
+					}
+				}
+
+				_obj.geojson = json;
+				
+				var customicon = makeMarker("marker",styles['default'].color);
+				log('log','icon',customicon);
+
+				var geoattrs = {
+					'style': styles['default'],
+					'pointToLayer': function(geoJsonPoint, latlng){ return L.marker(latlng,{icon: customicon}); },
+					'onEachFeature': function(feature, layer){
+						//var popup = popuptext(feature,{'id':id,'this':_obj});
+						//if(popup) layer.bindPopup(popup);
+					}
+				};
+				
+				_obj.signals = L.geoJSON(json,geoattrs);
+				_obj.signals.addTo(_obj.map);
+				var features = _obj.signals.getLayers();
+				for(var i = 0; i < features.length; i++){
+					if(features[i].feature.zone){
+						for(var j = 0; j < _obj.detectionzones.length; j++){
+							if(_obj.detectionzones[j].id==i) _obj.detectionzones[j].l = features[i];
+						}
+					}
+				}
+				return true;
+			});
+		}
+		return this;
+	}
+
+	app = new App();
+	app.getFeatures();	
+
+
+	if('serviceWorker' in navigator){
+		window.addEventListener('load',function(){
+			navigator.serviceWorker.register('sw.js');
+		});
+	}
+
 })(window || this);

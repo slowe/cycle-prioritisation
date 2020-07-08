@@ -1,0 +1,19 @@
+{
+	"lang": "en",
+	"dir": "ltr",
+	"name": "Leeds cycle prioritisation",
+	"short_name": "Cyclr Leeds",
+	"start_url": ".",
+	"display": "fullscreen",
+	"description": "Change the traffic lights",
+	"start_url": "https://strudel.org.uk/cycle-prioritisation/index.html",
+	"orientation": "portrait",
+	"theme_color": "#2254F4",
+	"background_color": "#2254F4",
+	"icons": [{
+		"src": "odileeds.png",
+		"sizes": "600x600",
+		"type": "image/png"
+
+	}]
+}
