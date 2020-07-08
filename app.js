@@ -190,7 +190,20 @@ var app;
 		var mperpx = 40075016.686 * Math.abs(Math.cos(lat * 180/Math.PI)) / Math.pow(2, zoom+8);
 		return m/mperpx;
 	}
-		
+	
+	function log(){
+		console.log(arguments);
+		var str = "";
+		var el = document.getElementById('log');
+		var typ = (typeof arguments[0]==="string" && (arguments[0]=="log" || arguments[0]=="warning" || arguments[0]=="error" || arguments[0]=="info")) ? arguments[0] : "log";
+		var d = (new Date()).toISOString().replace(/^.*T([0-9]{2}:[0-9]{2}:[0-9]{2}).*$/,function(m,p1){ return p1; });
+		for(var i = 1; i < arguments.length; i++){
+			console[typ](i,arguments[i]);
+			if(typeof arguments[i]==="string") str += (str ? "<br />":"")+d+': '+arguments[i];
+		}
+		el.innerHTML = str+'<br />'+el.innerHTML;
+		return this;
+	}
 	// Define a function to get user location
 	function GeoLocation(options){
 		if(!options) options = {};
@@ -202,9 +215,10 @@ var app;
 		this.setLocation = function(p){
 
 			if(!p){
-				console.warning('No location provided');
+				log('warning','No location provided');
 				return this;
 			}
+			log('info','setLocation');
 			var btns = document.getElementsByClassName('leaflet-control-geolocate');
 
 			console.log('setLocation',p);
